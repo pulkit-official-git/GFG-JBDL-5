@@ -5,6 +5,7 @@ import com.example.b5minorproject1.models.Authority;
 import com.example.b5minorproject1.models.Student;
 import com.example.b5minorproject1.models.StudentStatus;
 import com.example.b5minorproject1.models.User;
+import com.example.b5minorproject1.repositories.RedisRepository;
 import com.example.b5minorproject1.repositories.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ public class StudentService {
 
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    RedisRepository redisRepository;
 
     @Autowired
     UserService userService;
@@ -36,10 +40,20 @@ public class StudentService {
     }
 
     public CreateStudentResponse get(Integer id) {
-        Student student = this.studentRepository.findById(id).orElse(null);
+
+        Student student = this.redisRepository.get(id);
+
+        if (student == null) {
+            student = this.studentRepository.findById(id).orElse(null);
+        }
+
+
+
         if (student == null) {
             return null;
         }
+        //Assignment :- I want you to process storing in redis parallelly in a thread;
+        this.redisRepository.add(student);
         return CreateStudentResponse.builder()
                 .student(student)
                 .build();

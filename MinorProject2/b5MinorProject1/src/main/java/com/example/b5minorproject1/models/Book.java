@@ -31,7 +31,7 @@ public class Book {
 //    @JsonIgnoreProperties("books")
     private Author author;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn
     private Student student;
 
